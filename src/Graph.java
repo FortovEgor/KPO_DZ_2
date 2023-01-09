@@ -23,7 +23,7 @@ class Graph {
      * @param v - индекс откуда
      * @param w - индекс куда
      */
-    void addEdge(int v, int w) {
+    public void addEdge(int v, int w) {
         adjacency_matrix.get(v).add(w);
     }
 
@@ -66,7 +66,7 @@ class Graph {
      * @param visited - массив посещенных вершин
      * @param stack - стек значений вершин, нужен для рекурсии
      */
-    void topologicalSortUtil(int v, boolean[] visited, Stack<Integer> stack) {
+    private void topologicalSortUtil(int v, boolean[] visited, Stack<Integer> stack) {
         visited[v] = true;  // теперь текущая вершина считается посещенной
         Integer i;
 
@@ -86,7 +86,7 @@ class Graph {
      * рекурсивную функцию выше
      * @param vec - вектор вершин
      */
-    void topologicalSort(Vector<Integer> vec) {
+    public void topologicalSort(Vector<Integer> vec) {
         Stack<Integer> stack = new Stack<Integer>();
 
         // Mark all the vertices as not visited
@@ -95,10 +95,6 @@ class Graph {
         for (int i = 0; i < number_of_vertices; i++)
             visited[i] = false;
 
-        // Call the recursive helper
-        // function to store
-        // Topological Sort starting
-        // from all vertices one by one?
         for (int i = 0; i < number_of_vertices; i++)
             if (!visited[i])
                 topologicalSortUtil(i, visited, stack);
@@ -111,4 +107,3 @@ class Graph {
         Collections.reverse(vec);
     }
 }
-// This code is contributed by Aakash Hasija

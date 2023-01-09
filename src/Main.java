@@ -15,7 +15,7 @@ public class Main {
      * @param folder_path - абсолютный путь до корневой папки (просто строка)
      * @param all_files - массив ВСЕХ файлов в корневой папке и ее подпапках
      */
-    public static void listOfFiles(File dirPath, Map<String, ArrayList<String>> arr, String folder_path, ArrayList<String> all_files) throws Exception {
+    private static void listOfFiles(File dirPath, Map<String, ArrayList<String>> arr, String folder_path, ArrayList<String> all_files) throws Exception {
         File[] filesList = dirPath.listFiles();
         if (filesList == null) {
             throw new Exception("There are no files!");
@@ -83,7 +83,7 @@ public class Main {
         }
 
         // делаем словарь вида <название файла, его уник.номер>
-        Map<String, Integer> filesAndIndexes = new HashMap<String, Integer>();
+        Map<String, Integer> filesAndIndexes = new HashMap<>();
         int fileIndex = 0;  // уникальный индекс файла
         for(Map.Entry<String, ArrayList<String>> item : states.entrySet()){
             for (String elem: item.getValue()) {
@@ -100,7 +100,7 @@ public class Main {
         }
 
         // словарь типа <индекс файла, индексы файлов от которых он зависит>
-        Map<Integer, ArrayList<Integer>> mapForTopologySort = new HashMap<Integer, ArrayList<Integer>>();
+        Map<Integer, ArrayList<Integer>> mapForTopologySort = new HashMap<>();
         for(Map.Entry<String, ArrayList<String>> item : states.entrySet()){
             ArrayList<Integer> indexes = new ArrayList<Integer>();  // массив "правых" индексов
             String value = item.getKey();
