@@ -1,13 +1,11 @@
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
 public class Main {
-    private static String extension = ".txt";
+    private static final String EXTENSION = ".txt";
 
     /**
      * Функция рекурсивно обходит все папки и файлы корневой директории
@@ -17,8 +15,11 @@ public class Main {
      * @param folder_path - абсолютный путь до корневой папки (просто строка)
      * @param all_files - массив ВСЕХ файлов в корневой папке и ее подпапках
      */
-    public static void listOfFiles(File dirPath, Map<String, ArrayList<String>> arr, String folder_path, ArrayList<String> all_files){
-        File filesList[] = dirPath.listFiles();
+    public static void listOfFiles(File dirPath, Map<String, ArrayList<String>> arr, String folder_path, ArrayList<String> all_files) throws Exception {
+        File[] filesList = dirPath.listFiles();
+        if (filesList == null) {
+            throw new Exception("There are no files!");
+        }
         for (File file : filesList) {
             if (file.isFile()) {
                 try {
@@ -39,9 +40,8 @@ public class Main {
                             ArrayList<String> dependencies = new ArrayList<String>();
 
                             // добавляем зависимые файлы в наш массив
-                            for (int i = 0; i < requires.length; ++i) {
-                                dependencies.add(requires[i].trim() + extension);
-                                System.out.println("requires[i].trim(): " + requires[i].trim());
+                            for (String require : requires) {
+                                dependencies.add(require.trim() + EXTENSION);
                             }
 
                             // сохраняем имя файла и его зависимости
@@ -49,17 +49,12 @@ public class Main {
                             if (temp_arr == null) {
                                 arr.put(relative_name, dependencies);
                             } else {
-                                for (int i = 0; i < dependencies.size(); ++i) {
-//                                    System.out.println("dep[i] = " + dependencies.get(i));
-                                    temp_arr.add(dependencies.get(i));
-                                }
+                                temp_arr.addAll(dependencies);
                                 arr.put(relative_name, temp_arr);
                             }
-//                            System.out.println("relative_name: " + relative_name + " | deps:" + dependencies);
                         }
                     }
                     myReader.close();
-//                    System.out.println("Relative name: " + relative_name);
                     all_files.add(relative_name);
                 } catch (Exception e) {
                     System.out.println("An error occurred.");
@@ -71,43 +66,7 @@ public class Main {
         }
     }
 
-    /**
-     * Функция выводит на экран весь словарь типа <название файла; все его зависимости>
-     * @param arr - словарь типа <название файла; все его зависимости>
-     */
-    private static void showDebugInfo(Map<String, ArrayList<String>> arr) {
-        System.out.println();
-        System.out.println("---------- Our map: ----------");
-        for(Map.Entry<String,  ArrayList<String>> item : arr.entrySet()){
-            System.out.printf("Key: %s  Value: %s \n", item.getKey(), item.getValue());
-        }
-        System.out.println("----------  ----------");
-        System.out.println("\n");
-    }
-
-    /**
-     * Функция печатает все содержимое файла с путем full_path
-     * @param full_path - абсолютный путь до корневой папки (просто строка)
-     */
-    private static void printFileContent(String full_path) {
-        System.out.println("Чтение файла НАЧАТО");
-        try {
-            File file = new File(full_path + extension);
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
-            String line;
-            while ((line = br.readLine()) != null) {
-                //process the line
-                System.out.println(line);
-            }
-        } catch (Exception e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-        System.out.println("Чтение файла ЗАКОНЧЕНО");
-    }
-
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
         // Creating a File object for directory
         String folder_path = "/Users/egorfortov/Desktop/KPO/";  // корневая директория
         File file = new File(folder_path);  // передаем путь к нужной папке с файлами (т.е. к корневой директории)
@@ -116,21 +75,11 @@ public class Main {
 
         ArrayList<String> all_files = new ArrayList<>();
         // Ищем все файлы в нашей корневой директории
-        listOfFiles(file, states, folder_path, all_files);
-
-        System.out.println("---------- MAP ----------");
-        states.forEach((key, value) -> System.out.println(key + ":" + value));
-        System.out.println("---------- MAP ----------");
-
-
-        // вывод всего нашего map-a, то есть всех файлов, содержащих зависимости и их самих
-//        showDebugInfo(states);
-
-        ArrayList<String> separate_files = new ArrayList<String>();
-        for (int i = 0; i < all_files.size(); ++i) {
-            if (!states.containsKey(all_files.get(i))) {
-                separate_files.add(all_files.get(i));
-            }
+        try {
+            listOfFiles(file, states, folder_path, all_files);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
         }
 
         // делаем словарь вида <название файла, его уник.номер>
@@ -186,16 +135,10 @@ public class Main {
         }
         // graph is Acyclic => make topology sort
         // "Топологическая сортировка графа:
-        Vector vec = new Vector();  // нужный нам порядок
+        Vector<Integer> vec = new Vector<>();  // нужный нам порядок
         g.topologicalSort(vec);  // нужный нам порядок
 
         ArrayList<String> all_printed_files = new ArrayList<>();
-
-        System.out.println("####");
-        for (int i = 0; i < all_files.size(); ++i) {
-            System.out.println(all_files.get(i));
-        }
-        System.out.println("####");
 
         // соотносим индексы их файлам
         System.out.println("###########################################");
@@ -204,22 +147,21 @@ public class Main {
             final int j = i;
             filesAndIndexes.forEach((key, value) -> {
                 if (value.equals(vec.get(j))) {
-                    if (!Arrays.asList(all_printed_files).contains(key)) {
+                    if (!all_printed_files.contains(key)) {
                         all_printed_files.add(key);
                         System.out.println(key);
                     }
                 }
             });
         }
-
-        System.out.println("AAAAAAAAAAAAAAAAAA");
+        
         all_files.removeAll(all_printed_files);
         // вывод всех файлов, которые ни от кого не зависят и их нет
         // в зависимостях всех выведенных файлов
-        for (int i = 0; i < all_files.size(); ++i) {
-            if (!Arrays.asList(all_printed_files).contains(all_files.get(i))) {
-                System.out.println(all_files.get(i));
-                all_printed_files.add(all_files.get(i));
+        for (String allFile : all_files) {
+            if (!all_printed_files.contains(allFile)) {
+                System.out.println(allFile);
+                all_printed_files.add(allFile);
             }
         }
 
@@ -227,17 +169,18 @@ public class Main {
         System.out.println("###########################################\n\n");
         System.out.println("###########################################");
         System.out.println("Сконкатенированные файлы:");
-        for (int i = 0; i < all_printed_files.size(); ++i) {
+        for (String allPrintedFile : all_printed_files) {
             // пропускаем скрытые файлы, сгенерированные mac os
-            if (all_printed_files.get(i).contains("DS_Store")) {
+            if (allPrintedFile.contains("DS_Store")) {
                 continue;
             }
-            Path filePath = Path.of(folder_path + all_printed_files.get(i));
+            Path filePath = Path.of(folder_path + allPrintedFile);
             String content = "CAN NOT READ THIS FILE \n";
             try {
                 content = Files.readString(filePath);
-            } catch (Exception e){};  // ошибку никак не обрабатываем, продолжаем читать файлы дальше
-
+            } catch (Exception ignored) {
+            }
+            ;  // ошибку никак не обрабатываем, продолжаем читать файлы дальше
             System.out.println(content);
         }
         System.out.println("###########################################");
