@@ -41,6 +41,7 @@ public class Main {
                             // добавляем зависимые файлы в наш массив
                             for (int i = 0; i < requires.length; ++i) {
                                 dependencies.add(requires[i].trim() + extension);
+                                System.out.println("requires[i].trim(): " + requires[i].trim());
                             }
 
                             // сохраняем имя файла и его зависимости
@@ -49,13 +50,16 @@ public class Main {
                                 arr.put(relative_name, dependencies);
                             } else {
                                 for (int i = 0; i < dependencies.size(); ++i) {
+//                                    System.out.println("dep[i] = " + dependencies.get(i));
                                     temp_arr.add(dependencies.get(i));
                                 }
                                 arr.put(relative_name, temp_arr);
                             }
+//                            System.out.println("relative_name: " + relative_name + " | deps:" + dependencies);
                         }
                     }
                     myReader.close();
+//                    System.out.println("Relative name: " + relative_name);
                     all_files.add(relative_name);
                 } catch (Exception e) {
                     System.out.println("An error occurred.");
@@ -113,6 +117,10 @@ public class Main {
         ArrayList<String> all_files = new ArrayList<>();
         // Ищем все файлы в нашей корневой директории
         listOfFiles(file, states, folder_path, all_files);
+
+        System.out.println("---------- MAP ----------");
+        states.forEach((key, value) -> System.out.println(key + ":" + value));
+        System.out.println("---------- MAP ----------");
 
 
         // вывод всего нашего map-a, то есть всех файлов, содержащих зависимости и их самих
@@ -183,26 +191,36 @@ public class Main {
 
         ArrayList<String> all_printed_files = new ArrayList<>();
 
+        System.out.println("####");
+        for (int i = 0; i < all_files.size(); ++i) {
+            System.out.println(all_files.get(i));
+        }
+        System.out.println("####");
+
         // соотносим индексы их файлам
         System.out.println("###########################################");
         System.out.println("Итоговый порядок файлов:");
-        int kolvo_outputs = 0;
         for (int i = 0; i < vec.size(); ++i) {
             final int j = i;
             filesAndIndexes.forEach((key, value) -> {
                 if (value.equals(vec.get(j))) {
-                    all_printed_files.add(key);
-                    System.out.println(key);
+                    if (!Arrays.asList(all_printed_files).contains(key)) {
+                        all_printed_files.add(key);
+                        System.out.println("key: " + key);
+                    }
                 }
             });
         }
 
+        System.out.println("AAAAAAAAAAAAAAAAAA");
         all_files.removeAll(all_printed_files);
         // вывод всех файлов, которые ни от кого не зависят и их нет
         // в зависимостях всех выведенных файлов
         for (int i = 0; i < all_files.size(); ++i) {
-            System.out.println(all_printed_files.get(i));
-            all_printed_files.add(all_files.get(i));
+            if (!Arrays.asList(all_printed_files).contains(all_files.get(i))) {
+                System.out.println(all_files.get(i));
+                all_printed_files.add(all_files.get(i));
+            }
         }
 
         // теперь в all_printed_files лежат все файлы в нужном нам порядке
