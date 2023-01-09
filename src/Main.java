@@ -206,7 +206,7 @@ public class Main {
                 if (value.equals(vec.get(j))) {
                     if (!Arrays.asList(all_printed_files).contains(key)) {
                         all_printed_files.add(key);
-                        System.out.println("key: " + key);
+                        System.out.println(key);
                     }
                 }
             });
