@@ -71,7 +71,7 @@ public class Main {
         String folder_path = "/Users/egorfortov/Desktop/KPO/";  // корневая директория
         File file = new File(folder_path);  // передаем путь к нужной папке с файлами (т.е. к корневой директории)
 
-        Map<String, ArrayList<String>> states = new HashMap<String, ArrayList<String>>();  // <название файла, строка с require>
+        Map<String, ArrayList<String>> states = new HashMap<>();  // <название файла, строка с require>
 
         ArrayList<String> all_files = new ArrayList<>();
         // Ищем все файлы в нашей корневой директории
@@ -118,25 +118,26 @@ public class Main {
 
         ////////////////////////////// KEY ALGORITHM //////////////////////////////
         int V = filesAndIndexes.size();  // количество вершин в графе = количество файлов
-        Graph g = new Graph(V);
+        Graph files_graph = new Graph(V);
 
         // вводим однонаправленные ребра графа - НАЧАЛО
         for(Map.Entry<Integer,  ArrayList<Integer>> item : mapForTopologySort.entrySet()) {
             for (int i = 0; i < item.getValue().size(); ++i) {
                 int index2 = item.getValue().get(i);
-                g.addEdge(item.getKey(), index2);
+                files_graph.addEdge(item.getKey(), index2);
             }
         }
         // вводим однонаправленные ребра графа - КОНЕЦ
 
-        if (g.isCyclic()) {
+        if (files_graph.isCyclic()) {
             System.out.println("\nГраф цикличен, невозможно выдать требуемый порядок файлов!");
             return;
         }
+        
         // graph is Acyclic => make topology sort
-        // "Топологическая сортировка графа:
+        // "Топологическая сортировка" графа:
         Vector<Integer> vec = new Vector<>();  // нужный нам порядок
-        g.topologicalSort(vec);  // нужный нам порядок
+        files_graph.topologicalSort(vec);  // нужный нам порядок
 
         ArrayList<String> all_printed_files = new ArrayList<>();
 
@@ -164,8 +165,8 @@ public class Main {
                 all_printed_files.add(allFile);
             }
         }
-
         // теперь в all_printed_files лежат все файлы в нужном нам порядке
+
         System.out.println("###########################################\n\n");
         System.out.println("###########################################");
         System.out.println("Сконкатенированные файлы:");
