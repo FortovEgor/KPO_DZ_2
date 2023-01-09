@@ -55,8 +55,6 @@ public class ListOfFiles {
                                 }
                                 arr.put(relative_name, temp_arr);
                             }
-
-                            System.out.println("RN: " + relative_name + " | DEP: " + dependencies);
                         }
                     }
                     myReader.close();
@@ -120,9 +118,7 @@ public class ListOfFiles {
 
 
         // вывод всего нашего map-a, то есть всех файлов, содержащих зависимости и их самих
-        showDebugInfo(states);
-
-        System.out.println("\n\n\n");
+//        showDebugInfo(states);
 
         ArrayList<String> separate_files = new ArrayList<String>();
         for (int i = 0; i < all_files.size(); ++i) {
@@ -131,21 +127,13 @@ public class ListOfFiles {
             }
         }
 
-        for (int i = 0; i < separate_files.size(); ++i) {
-            System.out.println(all_files.get(i));
-        }
-
-        System.out.println("\n\n\n");
-
         // делаем словарь вида <название файла, его уник.номер>
         Map<String, Integer> filesAndIndexes = new HashMap<String, Integer>();
         int fileIndex = 0;  // уникальный индекс файла
         for(Map.Entry<String, ArrayList<String>> item : states.entrySet()){
-            System.out.printf("Key: %s  Value: %s \n", item.getKey(), item.getValue());
             for (String elem: item.getValue()) {
                 if (!filesAndIndexes.containsKey(elem)) {
                     filesAndIndexes.put(elem, fileIndex);
-                    System.out.println("elem: " + elem);
                     ++fileIndex;
                 }
             }
@@ -159,7 +147,6 @@ public class ListOfFiles {
         // словарь типа <индекс файла, индексы файлов от которых он зависит>
         Map<Integer, ArrayList<Integer>> mapForTopologySort = new HashMap<Integer, ArrayList<Integer>>();
         for(Map.Entry<String, ArrayList<String>> item : states.entrySet()){
-            System.out.printf("Key: %s  Value: %s \n", item.getKey(), item.getValue());
             ArrayList<Integer> indexes = new ArrayList<Integer>();  // массив "правых" индексов
             String value = item.getKey();
             int file_index = filesAndIndexes.get(value);
@@ -171,18 +158,8 @@ public class ListOfFiles {
             mapForTopologySort.put(file_index, indexes);
         }
 
-        System.out.println("Зависимости файлах в индексах:");
         // теперь можем работать со словарем mapForTopologySort, используем его
         // для топологической сортировки и проверки на цикличность нашего графа
-        for(Map.Entry<Integer,  ArrayList<Integer>> item : mapForTopologySort.entrySet()) {
-            System.out.print(item.getKey() + ": ");
-            for (int i = 0; i < item.getValue().size(); ++i) {
-                int index2 = item.getValue().get(i);
-                System.out.print(index2 + " ");
-            }
-            System.out.println();
-        }
-
 
         ////////////////////////////// KEY ALGORITHM //////////////////////////////
         int V = filesAndIndexes.size();  // количество вершин в графе = количество файлов
@@ -202,18 +179,14 @@ public class ListOfFiles {
             return;
         }
         // graph is Acyclic => make topology sort
-        System.out.println("Топологическая сортировка графа:");
+        // "Топологическая сортировка графа:
         Vector vec = new Vector();  // нужный нам порядок
         g.topologicalSort(vec);  // нужный нам порядок
 
-        for (int i = 0; i < vec.size(); ++i) {
-            System.out.print(vec.get(i) + " ");
-        }
-
         ArrayList<String> all_printed_files = new ArrayList<>();
 
-        // соотносим индексы их файлам  // NOT WORKING ?????
-        System.out.println("\n#############################################");
+        // соотносим индексы их файлам
+        System.out.println("###########################################");
         System.out.println("Итоговый порядок файлов:");
         int kolvo_outputs = 0;
         for (int i = 0; i < vec.size(); ++i) {
@@ -235,7 +208,9 @@ public class ListOfFiles {
         }
 
         // теперь в all_printed_files лежат все файлы в нужном нам порядке
-        System.out.println("CONCATENATED:");
+        System.out.println("###########################################\n\n");
+        System.out.println("###########################################");
+        System.out.println("Сконкатенированные файлы:");
         for (int i = 0; i < all_printed_files.size(); ++i) {
             // пропускаем скрытые файлы, сгенерированные mac os
             if (all_printed_files.get(i).contains("DS_Store")) {
@@ -249,6 +224,6 @@ public class ListOfFiles {
 
             System.out.println(content);
         }
-
+        System.out.println("###########################################");
     }
 }

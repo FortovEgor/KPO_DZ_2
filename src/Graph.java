@@ -112,13 +112,8 @@ class Graph {
         while (stack.empty() == false) {
             int elem = stack.pop();
             vec.addElement(elem);
-//            System.out.print(elem + " ");
         }
         Collections.reverse(vec);
-//        System.out.println();
-//        for (int i = vec.size()-1; i >= 0; --i) {
-//            System.out.print(vec.get(i) + " ");
-//        }
     }
 
     // Driver code
