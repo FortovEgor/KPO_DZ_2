@@ -23,7 +23,6 @@ public class ListOfFiles {
         File filesList[] = dirPath.listFiles();
         for (File file : filesList) {
             if (file.isFile()) {
-//                System.out.println("File path: " + file.getName());
                 try {
                     Scanner myReader = new Scanner(file);
                     String relative_name = file.getPath().replaceAll(folder_path, "");
@@ -31,13 +30,11 @@ public class ListOfFiles {
                         String line = myReader.nextLine();
 
                         if (line.contains("require")) {  // есть ли в этой строчке зависимости
-//                            System.out.println("line: " + line);
                             line = line.trim().
                                     replaceAll("require", "").
                                     replaceAll("‘", "").
                                     replaceAll("’", "XYZ").
                                     trim();  // extract нужное из строки
-//                            System.out.println("line: " + line);
                             String[] requires = line.split("XYZ");  // XYZ - разделитель
 
                             // зависимости из текущего файла
@@ -60,9 +57,6 @@ public class ListOfFiles {
                             }
 
                             System.out.println("RN: " + relative_name + " | DEP: " + dependencies);
-//                            System.out.println("////////////////////////");
-//                            System.out.println(file.getPath().replaceAll(folder_path, ""));
-//                            System.out.println("////////////////////////");
                         }
                     }
                     myReader.close();
@@ -71,7 +65,6 @@ public class ListOfFiles {
                     System.out.println("An error occurred.");
                     e.printStackTrace();
                 }
-
             } else if (file.isDirectory()) {
                 listOfFiles(file, arr, folder_path, all_files);
             }
@@ -144,43 +137,24 @@ public class ListOfFiles {
 
         System.out.println("\n\n\n");
 
-
-//        System.out.println("\n--------------------------");
-//        System.out.println(((states.get("File 2-2.txt")).toArray())[0] + ".txt");
-//        printFileContent(folder_path + ((states.get("File 2-2.txt")).toArray())[0]);
-
-
-        // WORKING --- BEGIN
         // делаем словарь вида <название файла, его уник.номер>
         Map<String, Integer> filesAndIndexes = new HashMap<String, Integer>();
         int fileIndex = 0;  // уникальный индекс файла
         for(Map.Entry<String, ArrayList<String>> item : states.entrySet()){
             System.out.printf("Key: %s  Value: %s \n", item.getKey(), item.getValue());
             for (String elem: item.getValue()) {
-//                System.out.println("index: " + fileIndex);
                 if (!filesAndIndexes.containsKey(elem)) {
                     filesAndIndexes.put(elem, fileIndex);
                     System.out.println("elem: " + elem);
-//                    System.out.println("index: " + filesAndIndexes.get(elem));
                     ++fileIndex;
                 }
             }
             String elem = item.getKey();
             if (!filesAndIndexes.containsKey(elem)) {
                 filesAndIndexes.put(elem, fileIndex);
-//                System.out.println("elem: " + elem);
-//                    System.out.println("index: " + filesAndIndexes.get(elem));
                 ++fileIndex;
             }
         }
-
-        System.out.println("///////////////////////////");  // for DEBUG only
-        for(Map.Entry<String,  Integer> item : filesAndIndexes.entrySet()){
-            System.out.printf("Key: %s  Value: %s \n", item.getKey(), item.getValue());
-        }
-        System.out.println("///////////////////////////");  // for DEBUG only
-        // WORKING --- END
-
 
         // словарь типа <индекс файла, индексы файлов от которых он зависит>
         Map<Integer, ArrayList<Integer>> mapForTopologySort = new HashMap<Integer, ArrayList<Integer>>();
@@ -188,7 +162,6 @@ public class ListOfFiles {
             System.out.printf("Key: %s  Value: %s \n", item.getKey(), item.getValue());
             ArrayList<Integer> indexes = new ArrayList<Integer>();  // массив "правых" индексов
             String value = item.getKey();
-//            System.out.println(value);
             int file_index = filesAndIndexes.get(value);
             for (int i = 0; i < item.getValue().size(); ++i) {
                 String str = item.getValue().get(i);
@@ -222,11 +195,6 @@ public class ListOfFiles {
                 g.addEdge(item.getKey(), index2);
             }
         }
-//        g.addEdge(1, 2);
-//        g.addEdge(2, 3);
-//        g.addEdge(3, 4);
-//        g.addEdge(3, 5);
-//        g.addEdge(4, 2);
         // вводим однонаправленные ребра графа - КОНЕЦ
 
         if (g.isCyclic()) {
@@ -250,7 +218,6 @@ public class ListOfFiles {
         int kolvo_outputs = 0;
         for (int i = 0; i < vec.size(); ++i) {
             final int j = i;
-//            System.out.print(vec.get(i) + " ");
             filesAndIndexes.forEach((key, value) -> {
                 if (value.equals(vec.get(j))) {
                     all_printed_files.add(key);
@@ -259,9 +226,7 @@ public class ListOfFiles {
             });
         }
 
-//        System.out.println("PRINTED FILES QUANTITY: " + all_printed_files.size());
         all_files.removeAll(all_printed_files);
-//        System.out.println("ALL FOUND FILES QUANTITY: " + all_files.size());
         // вывод всех файлов, которые ни от кого не зависят и их нет
         // в зависимостях всех выведенных файлов
         for (int i = 0; i < all_files.size(); ++i) {
