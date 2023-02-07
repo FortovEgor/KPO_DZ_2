@@ -1,4 +1,4 @@
-# Sort_Files_In_Root_Dir
+# SortFilesInRootDir
 
 ## Программа, сортирующая все файлы в корневой папке и всех ее подпапках.
 
